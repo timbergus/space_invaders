@@ -15,7 +15,13 @@ int main(int, char **)
 
   InitWindow(screenWidth, screenHeight, "Space Invaders");
 
+  InitAudioDevice();
+
   SetTargetFPS(120);
+
+  Sound game_start_sound = LoadSound("src/resources/target.ogg");
+  Sound shoot_sound = LoadSound("src/resources/shoot.mp3");
+  Sound explosion = LoadSound("src/resources/explosion.mp3");
 
   std::vector<Projectile> projectiles;
   std::vector<Enemy> enemies;
@@ -33,6 +39,8 @@ int main(int, char **)
 
     enemies.push_back(enemy);
   }
+
+  PlaySound(game_start_sound);
 
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
@@ -58,6 +66,7 @@ int main(int, char **)
         {
           Projectile projectile(spaceships[i].get_position(), screenHeight - 10);
           projectiles.push_back(projectile);
+          PlaySound(shoot_sound);
         }
 
         projectile_added = true;
@@ -81,10 +90,9 @@ int main(int, char **)
       {
         if (CheckCollisionRecs(projectiles[i].shape, enemies[j].shape))
         {
-          // auto enemy_position = std::find(enemies.begin(), enemies.end(), enemy);
-
           enemies.erase(enemies.begin() + j);
           projectiles.erase(projectiles.begin() + i);
+          PlaySound(explosion);
         }
       }
 
@@ -100,6 +108,11 @@ int main(int, char **)
 
     EndDrawing();
   }
+
+  UnloadSound(game_start_sound);
+  UnloadSound(shoot_sound);
+
+  CloseAudioDevice();
 
   CloseWindow();
 
