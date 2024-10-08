@@ -1,5 +1,15 @@
 #include "projectile.h"
 
+Projectile::Projectile(int position_x, int position_y)
+{
+  this->position_x = position_x;
+  this->position_y = position_y;
+}
+
+Projectile::~Projectile()
+{
+}
+
 void Projectile::draw()
 {
   shape.x = position_x + 9;
@@ -17,14 +27,4 @@ void Projectile::move()
 bool Projectile::is_alive()
 {
   return position_y > -20;
-}
-
-Projectile::Projectile(int position_x, int position_y)
-{
-  this->position_x = position_x;
-  this->position_y = position_y;
-}
-
-Projectile::~Projectile()
-{
 }

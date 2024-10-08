@@ -1,5 +1,14 @@
 #include "spaceship.h"
 
+Spaceship::Spaceship(int positionX)
+{
+  this->positionX = positionX;
+}
+
+Spaceship::~Spaceship()
+{
+}
+
 void Spaceship::move_left()
 {
   positionX -= 1;
@@ -18,13 +27,4 @@ int Spaceship::get_position()
 void Spaceship::draw()
 {
   DrawRectangle(positionX, 390, 20, 10, RED);
-}
-
-Spaceship::Spaceship(int positionX)
-{
-  this->positionX = positionX;
-}
-
-Spaceship::~Spaceship()
-{
 }

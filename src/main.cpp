@@ -27,9 +27,9 @@ int main(int, char **)
 
   spaceships.push_back(spaceship);
 
-  for (auto i = 0; i < 3; i++)
+  for (auto i = 0; i < 8; i++)
   {
-    Enemy enemy(screenWidth / 2 - 10, 20 + 12 * i);
+    Enemy enemy(screenWidth / 2 - 10, 20 + 12 * i, i % 2 == 0 ? LEFT : RIGHT);
 
     enemies.push_back(enemy);
   }

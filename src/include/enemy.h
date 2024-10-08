@@ -2,10 +2,16 @@
 
 #include <raylib.h>
 
+enum Direction
+{
+  LEFT,
+  RIGHT,
+};
+
 class Enemy
 {
 private:
-  int direction = 1;
+  Direction direction = LEFT;
 
   int position_x = 0;
   int position_y = 0;
@@ -13,7 +19,7 @@ private:
 public:
   Rectangle shape{0, 0, 20, 10};
 
-  Enemy(int postion_x, int position_y);
+  Enemy(int postion_x, int position_y, Direction direction);
   ~Enemy();
 
   void draw();
