@@ -40,23 +40,23 @@ int main(int, char **)
 
     ClearBackground(DARKBLUE);
 
-    for (Spaceship &spaceship : spaceships)
+    for (int i = 0; i < static_cast<int>(spaceships.size()); i++)
     {
-      if (IsKeyDown(KEY_RIGHT) && spaceship.get_position() <= screenWidth - 20)
+      if (IsKeyDown(KEY_RIGHT) && spaceships[i].get_position() <= screenWidth - 20)
       {
-        spaceship.move_right();
+        spaceships[i].move_right();
       }
 
-      if (IsKeyDown(KEY_LEFT) && spaceship.get_position() >= 0)
+      if (IsKeyDown(KEY_LEFT) && spaceships[i].get_position() >= 0)
       {
-        spaceship.move_left();
+        spaceships[i].move_left();
       }
 
       if (IsKeyDown(KEY_SPACE))
       {
         if (!projectile_added)
         {
-          Projectile projectile(spaceship.get_position(), screenHeight - 10);
+          Projectile projectile(spaceships[i].get_position(), screenHeight - 10);
           projectiles.push_back(projectile);
         }
 
@@ -67,7 +67,7 @@ int main(int, char **)
         projectile_added = false;
       }
 
-      spaceship.draw();
+      spaceships[i].draw();
     }
 
     for (Enemy &enemy : enemies)
@@ -75,26 +75,26 @@ int main(int, char **)
       enemy.draw();
     }
 
-    for (Projectile &projectile : projectiles)
+    for (int i = 0; i < static_cast<int>(projectiles.size()); i++)
     {
-      for (Enemy &enemy : enemies)
+      for (int j = 0; j < static_cast<int>(enemies.size()); j++)
       {
-        if (CheckCollisionRecs(projectile.shape, enemy.shape))
+        if (CheckCollisionRecs(projectiles[i].shape, enemies[j].shape))
         {
           // auto enemy_position = std::find(enemies.begin(), enemies.end(), enemy);
 
-          enemies.erase(enemies.begin());
-          projectiles.erase(projectiles.begin());
+          enemies.erase(enemies.begin() + j);
+          projectiles.erase(projectiles.begin() + i);
         }
       }
 
-      if (projectile.is_alive())
+      if (projectiles[i].is_alive())
       {
-        projectile.move();
+        projectiles[i].move();
       }
       else
       {
-        projectiles.erase(projectiles.begin());
+        projectiles.erase(projectiles.begin() + i);
       }
     }
 
