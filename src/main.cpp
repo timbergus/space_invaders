@@ -1,6 +1,8 @@
 #include <vector>
 #include <raylib.h>
 #include <fmt/core.h>
+#include <algorithm>
+#include <ranges>
 
 #include "spaceship.h"
 #include "projectile.h"
@@ -8,8 +10,8 @@
 
 int main(int, char **)
 {
-  const int screenWidth = 400;
-  const int screenHeight = 400;
+  const int screenWidth{400};
+  const int screenHeight{400};
 
   SetConfigFlags(FLAG_MSAA_4X_HINT);
 
@@ -21,7 +23,7 @@ int main(int, char **)
 
   Sound game_start_sound = LoadSound("src/resources/target.ogg");
   Sound shoot_sound = LoadSound("src/resources/shoot.mp3");
-  Sound explosion = LoadSound("src/resources/explosion.mp3");
+  Sound explosion = LoadSound("src/resources/explosion_02.mp3");
 
   std::vector<Projectile> projectiles;
   std::vector<Enemy> enemies;
@@ -33,7 +35,7 @@ int main(int, char **)
 
   spaceships.push_back(spaceship);
 
-  for (auto i = 0; i < 8; i++)
+  for (auto i : std::ranges::views::iota(0, 6))
   {
     Enemy enemy(screenWidth / 2 - 10, 20 + 12 * i, i % 2 == 0 ? LEFT : RIGHT);
 
@@ -48,23 +50,23 @@ int main(int, char **)
 
     ClearBackground(DARKBLUE);
 
-    for (int i = 0; i < static_cast<int>(spaceships.size()); i++)
+    for (auto &spaceship : spaceships)
     {
-      if (IsKeyDown(KEY_RIGHT) && spaceships[i].get_position() <= screenWidth - 20)
+      if (IsKeyDown(KEY_RIGHT) && spaceship.get_position() <= screenWidth - 20)
       {
-        spaceships[i].move_right();
+        spaceship.move_right();
       }
 
-      if (IsKeyDown(KEY_LEFT) && spaceships[i].get_position() >= 0)
+      if (IsKeyDown(KEY_LEFT) && spaceship.get_position() >= 0)
       {
-        spaceships[i].move_left();
+        spaceship.move_left();
       }
 
       if (IsKeyDown(KEY_SPACE))
       {
         if (!projectile_added)
         {
-          Projectile projectile(spaceships[i].get_position(), screenHeight - 10);
+          Projectile projectile(spaceship.get_position(), screenHeight - 10);
           projectiles.push_back(projectile);
           PlaySound(shoot_sound);
         }
@@ -76,7 +78,7 @@ int main(int, char **)
         projectile_added = false;
       }
 
-      spaceships[i].draw();
+      spaceship.draw();
     }
 
     for (Enemy &enemy : enemies)
@@ -84,25 +86,25 @@ int main(int, char **)
       enemy.draw();
     }
 
-    for (int i = 0; i < static_cast<int>(projectiles.size()); i++)
+    for (auto &projectile : projectiles)
     {
-      for (int j = 0; j < static_cast<int>(enemies.size()); j++)
+      for (auto &enemy : enemies)
       {
-        if (CheckCollisionRecs(projectiles[i].shape, enemies[j].shape))
+        if (CheckCollisionRecs(projectile.shape, enemy.shape))
         {
-          enemies.erase(enemies.begin() + j);
-          projectiles.erase(projectiles.begin() + i);
+          enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
+          projectiles.erase(std::remove(projectiles.begin(), projectiles.end(), projectile), projectiles.end());
           PlaySound(explosion);
         }
       }
 
-      if (projectiles[i].is_alive())
+      if (projectile.is_alive())
       {
-        projectiles[i].move();
+        projectile.move();
       }
       else
       {
-        projectiles.erase(projectiles.begin() + i);
+        projectiles.erase(std::remove(projectiles.begin(), projectiles.end(), projectile), projectiles.end());
       }
     }
 

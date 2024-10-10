@@ -1,6 +1,7 @@
 #pragma once
 
 #include <raylib.h>
+#include <boost/uuid/uuid_generators.hpp>
 
 enum Direction
 {
@@ -11,6 +12,8 @@ enum Direction
 class Enemy
 {
 private:
+  boost::uuids::uuid id;
+
   Direction direction = LEFT;
 
   int position_x = 0;
@@ -23,4 +26,8 @@ public:
   ~Enemy();
 
   void draw();
+
+  static bool are_equal(const Enemy &rhs, const Enemy &lhs);
 };
+
+bool operator==(const Enemy &rhs, const Enemy &lhs);

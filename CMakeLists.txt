@@ -7,12 +7,15 @@ add_compile_options(-Wall -Wextra -Werror -Wpedantic)
 
 find_package(fmt REQUIRED)
 find_package(raylib REQUIRED)
+find_package(Boost REQUIRED)
 
 file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/apps/*.cpp)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/include)
+include_directories(${Boost_INCLUDE_DIR})
 
 add_executable(space_invaders ${CMAKE_SOURCE_DIR}/src/main.cpp ${SOURCES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})

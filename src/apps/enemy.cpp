@@ -2,6 +2,9 @@
 
 Enemy::Enemy(int position_x, int position_y, Direction direction)
 {
+  boost::uuids::random_generator generator;
+
+  this->id = generator();
   this->position_x = position_x;
   this->position_y = position_y;
   this->direction = direction;
@@ -35,4 +38,14 @@ void Enemy::draw()
   shape.y = position_y;
 
   DrawRectangleRec(shape, YELLOW);
+}
+
+bool Enemy::are_equal(const Enemy &rhs, const Enemy &lhs)
+{
+  return rhs.id == lhs.id;
+}
+
+bool operator==(const Enemy &rhs, const Enemy &lhs)
+{
+  return Enemy::are_equal(rhs, lhs);
 }
