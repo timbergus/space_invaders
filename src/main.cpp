@@ -23,9 +23,10 @@ int main(int, char **)
 
   Sound game_start_sound = LoadSound("src/resources/target.ogg");
   Sound shoot_sound = LoadSound("src/resources/shoot.mp3");
-  Sound explosion = LoadSound("src/resources/explosion_02.mp3");
+  Sound explosion_sound = LoadSound("src/resources/explosion_02.mp3");
 
   std::vector<Projectile> projectiles;
+  std::vector<Projectile> enemy_projectiles;
   std::vector<Enemy> enemies;
   std::vector<Spaceship> spaceships;
 
@@ -35,9 +36,9 @@ int main(int, char **)
 
   spaceships.push_back(spaceship);
 
-  for (auto i : std::ranges::views::iota(0, 6))
+  for (auto i : std::ranges::views::iota(0, 10))
   {
-    Enemy enemy(screenWidth / 2 - 10, 20 + 12 * i, i % 2 == 0 ? LEFT : RIGHT);
+    Enemy enemy(40 + 30 * i, 20, LEFT);
 
     enemies.push_back(enemy);
   }
@@ -100,7 +101,12 @@ int main(int, char **)
       {
         enemy.move_step();
 
-        enemy.shoot();
+        // Enemy shoot.
+
+        auto enemy_position = enemy.get_position();
+
+        Projectile projectile(std::get<0>(enemy_position), std::get<1>(enemy_position), YELLOW);
+        enemy_projectiles.push_back(projectile);
 
         time = local_time;
       }
@@ -114,7 +120,7 @@ int main(int, char **)
         {
           enemies.erase(std::remove(enemies.begin(), enemies.end(), enemy), enemies.end());
           projectiles.erase(std::remove(projectiles.begin(), projectiles.end(), projectile), projectiles.end());
-          PlaySound(explosion);
+          PlaySound(explosion_sound);
         }
       }
 
@@ -128,19 +134,25 @@ int main(int, char **)
       }
     }
 
-    for (auto &spaceship : spaceships)
+    for (auto &projectile : enemy_projectiles)
     {
-      for (auto &enemy : enemies)
+      for (auto &spaceship : spaceships)
       {
-        for (auto &projectile : enemy.projectiles)
+        if (CheckCollisionRecs(projectile.shape, spaceship.shape))
         {
-          if (CheckCollisionRecs(projectile.shape, spaceship.shape))
-          {
-            spaceships.erase(std::remove(spaceships.begin(), spaceships.end(), spaceship), spaceships.end());
-            enemy.projectiles.erase(std::remove(enemy.projectiles.begin(), enemy.projectiles.end(), projectile), enemy.projectiles.end());
-            PlaySound(explosion);
-          }
+          spaceships.erase(std::remove(spaceships.begin(), spaceships.end(), spaceship), spaceships.end());
+          enemy_projectiles.erase(std::remove(enemy_projectiles.begin(), enemy_projectiles.end(), projectile), enemy_projectiles.end());
+          PlaySound(explosion_sound);
         }
+      }
+
+      if (projectile.is_alive())
+      {
+        projectile.move(DOWN);
+      }
+      else
+      {
+        enemy_projectiles.erase(std::remove(enemy_projectiles.begin(), enemy_projectiles.end(), projectile), enemy_projectiles.end());
       }
     }
 
@@ -149,6 +161,7 @@ int main(int, char **)
 
   UnloadSound(game_start_sound);
   UnloadSound(shoot_sound);
+  UnloadSound(explosion_sound);
 
   CloseAudioDevice();
 

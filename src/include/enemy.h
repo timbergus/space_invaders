@@ -21,15 +21,15 @@ private:
 
 public:
   Rectangle shape{0, 0, 20, 10};
-  std::vector<Projectile> projectiles;
 
   Enemy(int postion_x, int position_y, EnemyDirection direction);
   ~Enemy();
 
   void move();
   void move_step();
-  void shoot();
   void draw();
+
+  std::tuple<int, int> get_position();
 
   static bool are_equal(const Enemy &rhs, const Enemy &lhs);
 };

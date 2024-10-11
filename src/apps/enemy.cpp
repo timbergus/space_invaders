@@ -63,30 +63,14 @@ void Enemy::move_step()
   }
 }
 
-void Enemy::shoot()
-{
-  if (projectiles.size() < 1)
-  {
-    Projectile projectile{static_cast<int>(shape.x), static_cast<int>(shape.y), YELLOW};
-    projectiles.push_back(projectile);
-  }
-}
-
 void Enemy::draw()
 {
-  for (auto &projectile : projectiles)
-  {
-    if (projectile.is_alive())
-    {
-      projectile.move(DOWN);
-    }
-    else
-    {
-      projectiles.erase(std::remove(projectiles.begin(), projectiles.end(), projectile), projectiles.end());
-    }
-  }
-
   DrawRectangleRec(shape, YELLOW);
+}
+
+std::tuple<int, int> Enemy::get_position()
+{
+  return {shape.x, shape.y};
 }
 
 bool Enemy::are_equal(const Enemy &rhs, const Enemy &lhs)
