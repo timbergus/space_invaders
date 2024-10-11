@@ -44,6 +44,8 @@ int main(int, char **)
 
   PlaySound(game_start_sound);
 
+  int time = 0;
+
   while (!WindowShouldClose()) // Detect window close button or ESC key
   {
     BeginDrawing();
@@ -62,11 +64,13 @@ int main(int, char **)
         spaceship.move_left();
       }
 
-      if (IsKeyDown(KEY_SPACE))
+      // Let's allow one single projectile on screen.
+
+      if (IsKeyDown(KEY_SPACE) and projectiles.size() < 1)
       {
         if (!projectile_added)
         {
-          Projectile projectile(spaceship.get_position(), screenHeight - 10);
+          Projectile projectile(spaceship.get_position(), screenHeight - 10, RED);
           projectiles.push_back(projectile);
           PlaySound(shoot_sound);
         }
@@ -81,9 +85,25 @@ int main(int, char **)
       spaceship.draw();
     }
 
+    auto local_time = static_cast<int>(GetTime());
+
     for (Enemy &enemy : enemies)
     {
       enemy.draw();
+    }
+
+    // Let's move the enemies once every second.
+
+    if (time != local_time)
+    {
+      for (Enemy &enemy : enemies)
+      {
+        enemy.move_step();
+
+        enemy.shoot();
+
+        time = local_time;
+      }
     }
 
     for (auto &projectile : projectiles)
@@ -100,11 +120,27 @@ int main(int, char **)
 
       if (projectile.is_alive())
       {
-        projectile.move();
+        projectile.move(UP);
       }
       else
       {
         projectiles.erase(std::remove(projectiles.begin(), projectiles.end(), projectile), projectiles.end());
+      }
+    }
+
+    for (auto &spaceship : spaceships)
+    {
+      for (auto &enemy : enemies)
+      {
+        for (auto &projectile : enemy.projectiles)
+        {
+          if (CheckCollisionRecs(projectile.shape, spaceship.shape))
+          {
+            spaceships.erase(std::remove(spaceships.begin(), spaceships.end(), spaceship), spaceships.end());
+            enemy.projectiles.erase(std::remove(enemy.projectiles.begin(), enemy.projectiles.end(), projectile), enemy.projectiles.end());
+            PlaySound(explosion);
+          }
+        }
       }
     }
 

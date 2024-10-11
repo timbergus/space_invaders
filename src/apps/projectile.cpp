@@ -1,12 +1,15 @@
 #include "projectile.h"
 
-Projectile::Projectile(int position_x, int position_y)
+Projectile::Projectile(int position_x, int position_y, Color color)
 {
   boost::uuids::random_generator generator;
 
   this->id = generator();
-  this->position_x = position_x;
-  this->position_y = position_y;
+
+  shape.x = position_x + 9;
+  shape.y = position_y;
+
+  this->color = color;
 }
 
 Projectile::~Projectile()
@@ -15,21 +18,29 @@ Projectile::~Projectile()
 
 void Projectile::draw()
 {
-  shape.x = position_x + 9;
-  shape.y = position_y;
-
-  DrawRectangleRec(shape, RED);
+  DrawRectangleRec(shape, color);
 }
 
-void Projectile::move()
+void Projectile::move(ProjectileDirection direction)
 {
-  position_y -= 2;
+  switch (direction)
+  {
+  case UP:
+    shape.y -= 2;
+    break;
+  case DOWN:
+    shape.y += 2;
+    break;
+  default:
+    break;
+  }
+
   draw();
 }
 
 bool Projectile::is_alive()
 {
-  return position_y > -20;
+  return shape.y > -20 and shape.y < 420;
 }
 
 bool Projectile::are_equal(const Projectile &rhs, const Projectile &lhs)
